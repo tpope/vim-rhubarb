@@ -38,13 +38,23 @@ function! s:credentials()
       let g:github_user = $LOGNAME
     endif
   endif
-  if !exists('g:github_token')
+  if !exists('g:github_password')
+    let g:github_password = $GITHUB_PASSWORD
+    if g:github_password ==# ''
+      let g:github_password = system('git config --get github.password')[0:-2]
+    endif
+  endif
+  if !exists('g:github_token') && g:github_password ==# ''
     let g:github_token = $GITHUB_TOKEN
     if g:github_token ==# ''
       let g:github_token = system('git config --get github.token')[0:-2]
     endif
   endif
-  return g:github_user.'/token:'.g:github_token
+  if exists('g:github_token') && g:github_token !=# ''
+    return g:github_user.'/token:'.g:github_token
+  else
+    return g:github_user.':'.g:github_password
+  endif
 endfunction
 
 function! rhubarb#json_parse(string)
