@@ -13,6 +13,16 @@ function! s:throw(string) abort
   throw v:errmsg
 endfunction
 
+function! s:shellesc(arg) abort
+  if a:arg =~ '^[A-Za-z0-9_/.-]\+$'
+    return a:arg
+  elseif &shell =~# 'cmd' && a:arg !~# '"'
+    return '"'.a:arg.'"'
+  else
+    return shellescape(a:arg)
+  endif
+endfunction
+
 function! s:repo_name()
   if !exists('b:github_repo')
     let repo = fugitive#buffer().repo()
@@ -44,20 +54,10 @@ function! s:credentials()
       let g:github_password = system('git config --get github.password')[0:-2]
     endif
   endif
-  if !exists('g:github_token') && g:github_password ==# ''
-    let g:github_token = $GITHUB_TOKEN
-    if g:github_token ==# ''
-      let g:github_token = system('git config --get github.token')[0:-2]
-    endif
-  endif
-  if exists('g:github_token') && g:github_token !=# ''
-    return g:github_user.'/token:'.g:github_token
-  else
-    return g:github_user.':'.g:github_password
-  endif
+  return g:github_user.':'.g:github_password
 endfunction
 
-function! rhubarb#json_parse(string)
+function! rhubarb#json_parse(string) abort
   let [null, false, true] = ['', 0, 1]
   let stripped = substitute(a:string,'\C"\(\\.\|[^"\\]\)*"','','g')
   if stripped !~# "[^,:{}\\[\\]0-9.\\-+Eaeflnr-u \n\r\t]"
@@ -69,22 +69,68 @@ function! rhubarb#json_parse(string)
   call s:throw("invalid JSON: ".stripped)
 endfunction
 
-function! rhubarb#get(path)
+function! rhubarb#json_generate(object) abort
+  if type(a:object) == type('')
+    return '"' . substitute(a:object, "[\001-\031\"\\\\]", '\=printf("\\u%04x", char2nr(submatch(0)))', 'g') . '"'
+  elseif type(a:object) == type([])
+    return '['.join(map(copy(a:object), 'rhubarb#json_generate(v:val)'),', ').']'
+  elseif type(a:object) == type({})
+    let pairs = []
+    for key in keys(a:object)
+      call add(pairs, rhubarb#json_generate(key) . ': ' . rhubarb#json_generate(a:object[key]))
+    endfor
+    return '{' . join(pairs, ', ') . '}'
+  else
+    return string(a:object)
+  endif
+endfunction
+
+function! s:curl_arguments(path, ...) abort
+  let options = a:0 ? a:1 : {}
+  let args = ['--silent']
+  call extend(args, ['-H', 'Accept: application/json'])
+  call extend(args, ['-H', 'Content-Type: application/json'])
+  if get(options, 'auth', '') =~# ':'
+    call extend(args, ['-u', options.auth])
+  elseif has_key(options, 'auth')
+    call extend(args, ['-H', 'Authorization: bearer ' . options.auth])
+  elseif exists('g:RHUBARB_TOKEN')
+    call extend(args, ['-H', 'Authorization: bearer ' . g:RHUBARB_TOKEN])
+  else
+    call extend(args, ['-u', s:credentials()])
+  endif
+  if has_key(options, 'method')
+    call extend(args, ['-X', toupper(options.method)])
+  endif
+  if type(get(options, 'data', '')) != type('')
+    call extend(args, ['-d', rhubarb#json_generate(options.data)])
+  elseif has_key(options, 'data')
+    call extend(args, ['-d', options.data])
+  endif
+  call add(args, a:path =~# '://' ? a:path : 'https://api.github.com'.a:path)
+  return args
+endfunction
+
+function! rhubarb#request(path, ...) abort
   if !executable('curl')
     call s:throw('cURL is required')
   endif
-  let url = a:path =~# '://' ? a:path : 'https://github.com/api/v2/json'.a:path
-  let url = substitute(url,'%s','\=s:repo_name()','')
-  let output = system('curl -s -L -H "Accept: application/json" -H "Content-Type: application/json" -u "'.s:credentials().'" '.url)
-  return rhubarb#json_parse(output)
+  let options = a:0 ? a:1 : {}
+  let args = s:curl_arguments(a:path, options)
+  let raw = system('curl '.join(map(copy(args), 's:shellesc(v:val)'), ' '))
+  if raw ==# ''
+    return raw
+  else
+    return rhubarb#json_parse(raw)
+  endif
+endfunction
+
+function! rhubarb#repo_request(...)
+  return rhubarb#request('/repos/' . s:repo_name() . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
 endfunction
 
 " }}}1
 " Issues {{{1
-
-function! rhubarb#issues(...)
-  return rhubarb#get('/issues/list/%s/'.(a:0 ? a:1 : 'open'))['issues']
-endfunction
 
 function! rhubarb#omnifunc(findstart,base)
   if a:findstart
@@ -92,7 +138,7 @@ function! rhubarb#omnifunc(findstart,base)
     return col('.')-1-strlen(existing)
   endif
   try
-    return map(reverse(rhubarb#issues()),'{"word": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+    return map(rhubarb#repo_request('issues'), '{"word": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
   catch /^\%(fugitive\|rhubarb\):/
     return v:errmsg
   endtry
