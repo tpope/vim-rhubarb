@@ -87,7 +87,7 @@ endfunction
 
 function! s:curl_arguments(path, ...) abort
   let options = a:0 ? a:1 : {}
-  let args = ['--silent']
+  let args = ['-q', '--silent']
   call extend(args, ['-H', 'Accept: application/json'])
   call extend(args, ['-H', 'Content-Type: application/json'])
   if get(options, 'auth', '') =~# ':'
@@ -96,8 +96,10 @@ function! s:curl_arguments(path, ...) abort
     call extend(args, ['-H', 'Authorization: bearer ' . options.auth])
   elseif exists('g:RHUBARB_TOKEN')
     call extend(args, ['-H', 'Authorization: bearer ' . g:RHUBARB_TOKEN])
-  else
+  elseif s:credentials() !~# '^[^:]*:$'
     call extend(args, ['-u', s:credentials()])
+  else
+    call extend(args, ['--netrc'])
   endif
   if has_key(options, 'method')
     call extend(args, ['-X', toupper(options.method)])

@@ -38,6 +38,10 @@ rhubarb.vim your GitHub credentials:
         let g:github_user = '<user>'
         let g:github_password = '<password>'
 
+4. In a netrc:
+
+        echo 'machine api.github.com login <user> password <password>'>>~/.netrc
+
 If you don't have a preferred installation method, I recommend
 installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
 then simply copy and paste:
