@@ -94,6 +94,7 @@ function! s:curl_arguments(path, ...) abort
   let args = ['-q', '--silent']
   call extend(args, ['-H', 'Accept: application/json'])
   call extend(args, ['-H', 'Content-Type: application/json'])
+  call extend(args, ['-A', 'rhubarb.vim'])
   if get(options, 'auth', '') =~# ':'
     call extend(args, ['-u', options.auth])
   elseif has_key(options, 'auth')
