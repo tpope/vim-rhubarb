@@ -6,6 +6,10 @@ if exists("g:loaded_rhubarb") || v:version < 700 || &cp
 endif
 let g:loaded_rhubarb = 1
 
+if get(g:, 'fugitive_git_executable', 'git') ==# 'git' && executable('hub')
+  let g:fugitive_git_executable = 'hub'
+endif
+
 " Utility {{{1
 
 function! s:throw(string) abort
