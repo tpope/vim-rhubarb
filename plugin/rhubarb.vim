@@ -70,7 +70,7 @@ function! rhubarb#json_parse(string) abort
     catch
     endtry
   endif
-  call s:throw("invalid JSON: ".stripped)
+  call s:throw("invalid JSON: ".a:string)
 endfunction
 
 function! rhubarb#json_generate(object) abort
