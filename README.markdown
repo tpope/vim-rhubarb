@@ -1,5 +1,4 @@
-rhubarb.vim
-===========
+# rhubarb.vim
 
 If [fugitive.vim][] is the Git, rhubarb.vim is the Hub.  Or at least it
 could be.  One day.  Right now it's pretty stupid.  I almost named it
@@ -16,8 +15,7 @@ rhubarb.vim.
 
 [fugitive.vim]: https://github.com/tpope/vim-fugitive
 
-Installation
-------------
+## Installation
 
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
 required (included with OS X).  There are 5 ways you can tell
@@ -56,21 +54,18 @@ then simply copy and paste:
 Once help tags have been generated, you can view the manual with
 `:help rhubarb`.
 
-FAQ
----
+## FAQ
 
 > How do I turn off that preview window that shows the issue body?
 
     set completeopt-=preview
 
-Contributing
-------------
+## Contributing
 
 See the contribution guidelines for
 [fugitive.vim](https://github.com/tpope/vim-fugitive#readme).
 
-Self-Promotion
---------------
+## Self-Promotion
 
 Like rhubarb.vim? Follow the repository on
 [GitHub](https://github.com/tpope/vim-rhubarb).  And if
@@ -78,8 +73,7 @@ you're feeling especially charitable, follow [tpope](http://tpo.pe/) on
 [Twitter](http://twitter.com/tpope) and
 [GitHub](https://github.com/tpope).
 
-License
--------
+## License
 
 Copyright (c) Tim Pope.  Distributed under the same terms as Vim itself.
 See `:help license`.
