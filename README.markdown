@@ -60,11 +60,6 @@ Once help tags have been generated, you can view the manual with
 
     set completeopt-=preview
 
-## Contributing
-
-See the contribution guidelines for
-[fugitive.vim](https://github.com/tpope/vim-fugitive#readme).
-
 ## Self-Promotion
 
 Like rhubarb.vim? Follow the repository on
