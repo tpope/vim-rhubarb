@@ -20,27 +20,31 @@ Installation
 ------------
 
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
-required (included with OS X).  There are 3 ways you can tell
+required (included with OS X).  There are 5 ways you can tell
 rhubarb.vim your GitHub credentials:
 
-1. In Git:
+1. In a netrc:
+
+        echo 'machine api.github.com login <user> password <password>'>>~/.netrc
+
+2. In Git:
 
         git config --global github.user <user>
         git config --global github.password <password>
 
-2. In your shell:
+3. In your shell:
 
         export GITHUB_USER=<user>
         export GITHUB_PASSWORD=<password>
 
-3. In Vim:
+4. In Vim:
 
         let g:github_user = '<user>'
         let g:github_password = '<password>'
 
-4. In a netrc:
+5. With an API token:
 
-        echo 'machine api.github.com login <user> password <password>'>>~/.netrc
+        let g:RHUBARB_TOKEN = '<token>'
 
 If you don't have a preferred installation method, I recommend
 installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
