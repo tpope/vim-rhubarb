@@ -10,6 +10,11 @@ if get(g:, 'fugitive_git_executable', 'git') ==# 'git' && executable('hub')
   let g:fugitive_git_executable = 'hub'
 endif
 
+if !exists('g:dispatch_compilers')
+  let g:dispatch_compilers = {}
+endif
+let g:dispatch_compilers['hub'] = 'git'
+
 " Utility {{{1
 
 function! s:throw(string) abort
