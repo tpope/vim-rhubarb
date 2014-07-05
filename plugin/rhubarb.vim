@@ -146,11 +146,15 @@ endfunction
 
 function! rhubarb#omnifunc(findstart,base)
   if a:findstart
-    let existing = matchstr(getline('.')[0:col('.')-1],'#\d*$')
+    let existing = matchstr(getline('.')[0:col('.')-1],'#\d*$\|@\w*$')
     return col('.')-1-strlen(existing)
   endif
   try
-    return map(rhubarb#repo_request('issues'), '{"word": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+    if a:base =~# '^@'
+      return map(rhubarb#repo_request('collaborators'), '"@".v:val.login')
+    else
+      return map(rhubarb#repo_request('issues'), '{"word": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+    endif
   catch /^\%(fugitive\|rhubarb\):/
     return v:errmsg
   endtry
