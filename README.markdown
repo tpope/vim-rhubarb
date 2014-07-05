@@ -5,9 +5,9 @@ could be.  One day.  Right now it's pretty stupid.  I almost named it
 chubby.vim, but it just didn't feel right.
 
 So far there's only one feature:  In Git commit messages, GitHub issues
-can be omni-completed (`<C-X><C-O>`, see `:help compl-omni`).  This
-makes inserting those `Closes #123` remarks slightly easier than copying
-and pasting from the browser.
+and collaborators can be omni-completed (`<C-X><C-O>`, see `:help
+compl-omni`).  This makes inserting those `Closes #123` remarks slightly
+easier than copying and pasting from the browser.
 
 Maybe I'll extract `:Gbrowse` out of fugitive.vim and put it here
 instead.  Or maybe I'll add some cool Gist stuff.  You never know with
