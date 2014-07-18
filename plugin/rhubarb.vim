@@ -163,7 +163,7 @@ endfunction
 augroup rhubarb
   autocmd!
   autocmd User Fugitive
-        \ if &filetype ==# 'gitcommit' && expand('%:t') ==# 'COMMIT_EDITMSG' &&
+        \ if expand('%:p') =~# '\.git[\/].*MSG$' &&
         \   exists('+omnifunc') &&
         \   &omnifunc =~# '^\%(syntaxcomplete#Complete\)\=$' &&
         \   join(readfile(fugitive#buffer().repo().dir('config')),"\n")
