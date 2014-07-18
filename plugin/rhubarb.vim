@@ -32,7 +32,7 @@ function! s:shellesc(arg) abort
   endif
 endfunction
 
-function! s:repo_name()
+function! s:repo_name() abort
   if !exists('b:github_repo')
     let repo = fugitive#buffer().repo()
     let url = repo.config('remote.origin.url')
@@ -47,7 +47,7 @@ endfunction
 " }}}1
 " HTTP {{{1
 
-function! s:credentials()
+function! s:credentials() abort
   if !exists('g:github_user')
     let g:github_user = $GITHUB_USER
     if g:github_user ==# ''
@@ -137,14 +137,14 @@ function! rhubarb#request(path, ...) abort
   endif
 endfunction
 
-function! rhubarb#repo_request(...)
+function! rhubarb#repo_request(...) abort
   return rhubarb#request('/repos/' . s:repo_name() . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
 endfunction
 
 " }}}1
 " Issues {{{1
 
-function! rhubarb#omnifunc(findstart,base)
+function! rhubarb#omnifunc(findstart,base) abort
   if a:findstart
     let existing = matchstr(getline('.')[0:col('.')-1],'#\d*$\|@[[:alnum:]-]*$')
     return col('.')-1-strlen(existing)
