@@ -174,10 +174,14 @@ function! rhubarb#omnifunc(findstart,base) abort
       return map(rhubarb#repo_request('collaborators'), '"@".v:val.login')
     else
       let prefix = (a:base =~# '^#' ? '#' : s:repo_homepage().'/issues/')
-      return map(rhubarb#repo_request('issues'), '{"word": prefix.v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+      let issues = rhubarb#repo_request('issues')
+      if type(issues) == type({})
+        call s:throw(get(issues, 'message', 'unknown error'))
+      endif
+      return map(issues, '{"word": prefix.v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
     endif
   catch /^\%(fugitive\|rhubarb\):/
-    return v:errmsg
+    echoerr v:errmsg
   endtry
 endfunction
 
