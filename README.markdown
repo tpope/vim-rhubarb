@@ -17,6 +17,14 @@ rhubarb.vim.
 
 ## Installation
 
+If you don't have a preferred installation method, I recommend
+installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
+then simply copy and paste:
+
+    cd ~/.vim/bundle
+    git clone git://github.com/tpope/vim-rhubarb.git
+    vim -u NONE -c "helptags vim-rhubarb/doc" -c q
+
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
 required (included with OS X).  There are 5 ways you can tell
 rhubarb.vim your GitHub credentials:
@@ -43,16 +51,6 @@ rhubarb.vim your GitHub credentials:
 5. With an API token:
 
         let g:RHUBARB_TOKEN = '<token>'
-
-If you don't have a preferred installation method, I recommend
-installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
-then simply copy and paste:
-
-    cd ~/.vim/bundle
-    git clone git://github.com/tpope/vim-rhubarb.git
-
-Once help tags have been generated, you can view the manual with
-`:help rhubarb`.
 
 ## FAQ
 
