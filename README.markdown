@@ -26,31 +26,17 @@ then simply copy and paste:
     vim -u NONE -c "helptags vim-rhubarb/doc" -c q
 
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
-required (included with OS X).  There are 5 ways you can tell
-rhubarb.vim your GitHub credentials:
+required (included with OS X).
 
-1. In a netrc:
+Provide your GitHub credentials by adding them to your netrc:
 
-        echo 'machine api.github.com login <user> password <password>'>>~/.netrc
+    echo 'machine api.github.com login <user> password <password>' >> ~/.netrc
 
-2. In Git:
+There is not currently built-in support for OAuth, but you can add a token to
+your netrc if you fetch it by hand:
 
-        git config --global github.user <user>
-        git config --global github.password <password>
-
-3. In your shell:
-
-        export GITHUB_USER=<user>
-        export GITHUB_PASSWORD=<password>
-
-4. In Vim:
-
-        let g:github_user = '<user>'
-        let g:github_password = '<password>'
-
-5. With an API token:
-
-        let g:RHUBARB_TOKEN = '<token>'
+    echo 'machine api.github.com login <token> password x-oauth-basic' \
+      >> ~/.netrc
 
 ## FAQ
 
