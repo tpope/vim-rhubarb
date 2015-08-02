@@ -32,8 +32,9 @@ Provide your GitHub credentials by adding them to your netrc:
 
     echo 'machine api.github.com login <user> password <password>' >> ~/.netrc
 
-There is not currently built-in support for OAuth, but you can add a token to
-your netrc if you fetch it by hand:
+If you'd rather not store your password in plain text, you can
+[generate a personal access token](https://github.com/settings/tokens/new)
+and use that instead:
 
     echo 'machine api.github.com login <token> password x-oauth-basic' \
       >> ~/.netrc
