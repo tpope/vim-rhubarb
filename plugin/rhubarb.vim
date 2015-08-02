@@ -32,16 +32,21 @@ function! s:shellesc(arg) abort
   endif
 endfunction
 
-function! s:repo_name() abort
-  if !exists('b:github_repo')
+function! s:repo_homepage() abort
+  if !exists('b:rhubarb_homepage')
     let repo = fugitive#buffer().repo()
     let url = repo.config('remote.origin.url')
-    if url !~# 'github\.com[:/][^/]*/[^/]*\.git'
+    let name = matchstr(url, 'github\.com[:/]\zs[^/]*/[^/]\{-\}\ze\%(\.git\)\=$')
+    if empty(name)
       call s:throw('origin is not a GitHub repository: '.url)
     endif
-    let b:github_repo = matchstr(url,'github\.com[:/]\zs[^/]*/[^/]*\ze\.git')
+    let b:rhubarb_homepage = 'https://github.com/'.name
   endif
-  return b:github_repo
+  return b:rhubarb_homepage
+endfunction
+
+function! s:repo_name() abort
+  return matchstr(s:repo_homepage(), '://[^/]*/\zs.*')
 endfunction
 
 " }}}1
@@ -153,7 +158,8 @@ function! rhubarb#omnifunc(findstart,base) abort
     if a:base =~# '^@'
       return map(rhubarb#repo_request('collaborators'), '"@".v:val.login')
     else
-      return map(rhubarb#repo_request('issues'), '{"word": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+      let prefix = (a:base =~# '^#' ? '#' : s:repo_homepage().'/issues/')
+      return map(rhubarb#repo_request('issues'), '{"word": prefix.v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
     endif
   catch /^\%(fugitive\|rhubarb\):/
     return v:errmsg
