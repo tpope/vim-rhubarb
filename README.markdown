@@ -38,6 +38,11 @@ your netrc if you fetch it by hand:
     echo 'machine api.github.com login <token> password x-oauth-basic' \
       >> ~/.netrc
 
+If you are using GitHub Enterprise, repeat those steps for each domain (omit
+the `api.` portion). You'll also need to tell Rhubarb the root URLs:
+
+    let g:github_enterprise_urls = ['https://example.com']
+
 ## FAQ
 
 > How do I turn off that preview window that shows the issue body?
