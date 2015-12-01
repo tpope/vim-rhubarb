@@ -36,7 +36,7 @@ function! rhubarb#homepage_for_url(url) abort
   elseif !empty(base)
     return 'https://' . tr(base, ':', '/')
   else
-    return 'like '
+    return ''
   endif
 endfunction
 
