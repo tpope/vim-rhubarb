@@ -11,6 +11,9 @@ of features:
   those `Closes #123` remarks slightly easier than copying and pasting from
   the browser.
 
+* Sets up `:Git` to use [`hub`](https://github.com/github/hub) if installed
+  rather than `git`.
+
 [fugitive.vim]: https://github.com/tpope/vim-fugitive
 
 ## Installation
