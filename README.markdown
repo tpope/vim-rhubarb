@@ -22,7 +22,7 @@ installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
 then simply copy and paste:
 
     cd ~/.vim/bundle
-    git clone git://github.com/tpope/vim-rhubarb.git
+    git clone https://github.com/tpope/vim-rhubarb.git
     vim -u NONE -c "helptags vim-rhubarb/doc" -c q
 
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
