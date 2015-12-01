@@ -21,8 +21,9 @@ augroup rhubarb
         \ if expand('%:p') =~# '\.git[\/].*MSG$' &&
         \   exists('+omnifunc') &&
         \   &omnifunc =~# '^\%(syntaxcomplete#Complete\)\=$' &&
-        \   join(readfile(fugitive#buffer().repo().dir('config')),"\n")
-        \     =~# '\n[^;]*github\.com' |
+        \   !empty(filter(
+        \     readfile(fugitive#buffer().repo().dir('config')),
+        \     '!empty(rhubarb#homepage_for_url(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs\S*'')))')) |
         \   setlocal omnifunc=rhubarb#omnifunc |
         \ endif
   autocmd BufEnter *

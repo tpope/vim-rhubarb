@@ -23,30 +23,34 @@ function! s:shellesc(arg) abort
   endif
 endfunction
 
-function! s:homepage_for_url(url) abort
+function! rhubarb#homepage_for_url(url) abort
   let domain_pattern = 'github\.com'
   let domains = get(g:, 'github_enterprise_urls', get(g:, 'fugitive_github_domains', []))
   call map(copy(domains), 'substitute(v:val, "/$", "", "")')
   for domain in domains
     let domain_pattern .= '\|' . escape(split(domain, '://')[-1], '.')
   endfor
-  let repo = fugitive#buffer().repo()
   let base = matchstr(a:url, '^\%(https\=://\|git://\|git@\)\=\zs\('.domain_pattern.'\)[/:].\{-\}\ze\%(\.git\)\=$')
   if index(domains, 'http://' . matchstr(base, '^[^:/]*')) >= 0
     return 'http://' . tr(base, ':', '/')
   elseif !empty(base)
     return 'https://' . tr(base, ':', '/')
+  else
+    return ''
   endif
-  call s:throw('not a GitHub repository: '.a:url)
 endfunction
 
 function! s:repo_homepage() abort
-  if !exists('b:rhubarb_homepage')
-    let repo = fugitive#buffer().repo()
-    let url = repo.config('remote.origin.url')
-    let b:rhubarb_homepage = s:homepage_for_url(url)
+  if exists('b:rhubarb_homepage')
+    return b:rhubarb_homepage
   endif
-  return b:rhubarb_homepage
+  let repo = fugitive#repo()
+  let homepage = rhubarb#homepage_for_url(repo.config('remote.origin.url'))
+  if !empty(homepage)
+    let b:rhubarb_homepage = homepage
+    return b:rhubarb_homepage
+  endif
+  call s:throw('origin is not a GitHub repository')
 endfunction
 
 " Section: HTTP
