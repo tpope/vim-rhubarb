@@ -180,3 +180,57 @@ function! rhubarb#omnifunc(findstart,base) abort
     echoerr v:errmsg
   endtry
 endfunction
+
+" Section: Fugitive :Gbrowse support
+
+function! rhubarb#fugitive_url(opts, ...) abort
+  if a:0 || type(a:opts) != type({}) || !has_key(a:opts, 'repo')
+    return ''
+  endif
+  let root = s:homepage_for_url(get(a:opts, 'remote'))
+  if empty(root)
+    return ''
+  endif
+  let path = a:opts.path
+  if path =~# '^\.git/refs/heads/'
+    let branch = a:opts.repo.git_chomp('config','branch.'.path[16:-1].'.merge')[11:-1]
+    if branch ==# ''
+      return root . '/commits/' . path[16:-1]
+    else
+      return root . '/commits/' . branch
+    endif
+  elseif path =~# '^\.git/refs/.'
+    return root . '/commits/' . matchstr(path,'[^/]\+$')
+  elseif path =~# '.git/\%(config$\|hooks\>\)'
+    return root . '/admin'
+  elseif path =~# '^\.git\>'
+    return root
+  endif
+  if a:opts.revision =~# '^[[:alnum:]._-]\+:'
+    let commit = matchstr(a:opts.revision,'^[^:]*')
+  elseif a:opts.commit =~# '^\d\=$'
+    let local = matchstr(a:opts.repo.head_ref(),'\<refs/heads/\zs.*')
+    let commit = a:opts.repo.git_chomp('config','branch.'.local.'.merge')[11:-1]
+    if commit ==# ''
+      let commit = local
+    endif
+  else
+    let commit = a:opts.commit
+  endif
+  if a:opts.type == 'tree'
+    let url = substitute(root . '/tree/' . commit . '/' . path, '/$', '', 'g')
+  elseif a:opts.type == 'blob'
+    let url = root . '/blob/' . commit . '/' . path
+    if get(a:opts, 'line2') && a:opts.line1 == a:opts.line2
+      let url .= '#L' . a:opts.line1
+    elseif get(a:opts, 'line2')
+      let url .= '#L' . a:opts.line1 . '-L' . a:opts.line2
+    endif
+  elseif a:opts.type == 'tag'
+    let commit = matchstr(getline(3),'^tag \zs.*')
+    let url = root . '/tree/' . commit
+  else
+    let url = root . '/commit/' . commit
+  endif
+  return url
+endfunction

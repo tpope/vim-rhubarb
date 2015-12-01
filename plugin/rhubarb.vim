@@ -31,3 +31,11 @@ augroup rhubarb
         \    setlocal nolist linebreak filetype=markdown |
         \ endif
 augroup END
+
+if !exists('g:fugitive_browse_handlers')
+  let g:fugitive_browse_handlers = []
+endif
+
+if index(g:fugitive_browse_handlers, function('rhubarb#fugitive_url')) < 0
+  call insert(g:fugitive_browse_handlers, function('rhubarb#fugitive_url'))
+endif

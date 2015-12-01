@@ -1,17 +1,15 @@
 # rhubarb.vim
 
-If [fugitive.vim][] is the Git, rhubarb.vim is the Hub.  Or at least it
-could be.  One day.  Right now it's pretty stupid.  I almost named it
-chubby.vim, but it just didn't feel right.
+If [fugitive.vim][] is the Git, rhubarb.vim is the Hub.  Here's the full list
+of features:
 
-So far there's only one feature:  In Git commit messages, GitHub issues
-and collaborators can be omni-completed (`<C-X><C-O>`, see `:help
-compl-omni`).  This makes inserting those `Closes #123` remarks slightly
-easier than copying and pasting from the browser.
+* Enables `:Gbrowse` from fugitive.vim to open GitHub URLs.  (`:Gbrowse`
+  currently has native support for this, but it is slated to be removed.)
 
-Maybe I'll extract `:Gbrowse` out of fugitive.vim and put it here
-instead.  Or maybe I'll add some cool Gist stuff.  You never know with
-rhubarb.vim.
+* In commit messages, GitHub issues, issue URLs, and collaborators can be
+  omni-completed (`<C-X><C-O>`, see `:help compl-omni`).  This makes inserting
+  those `Closes #123` remarks slightly easier than copying and pasting from
+  the browser.
 
 [fugitive.vim]: https://github.com/tpope/vim-fugitive
 
