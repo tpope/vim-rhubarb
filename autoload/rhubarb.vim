@@ -184,7 +184,7 @@ endfunction
 " Section: Fugitive :Gbrowse support
 
 function! rhubarb#fugitive_url(opts, ...) abort
-  if a:0 || type(a:opts) != type({}) || !has_key(a:opts, 'repo')
+  if a:0 || type(a:opts) != type({}) || !has_key(a:opts, 'repo') || !has_key(a:opts, 'revision')
     return ''
   endif
   let root = s:homepage_for_url(get(a:opts, 'remote'))
