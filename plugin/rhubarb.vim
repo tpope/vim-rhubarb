@@ -128,6 +128,9 @@ function! s:curl_arguments(path, ...) abort
   if has_key(options, 'method')
     call extend(args, ['-X', toupper(options.method)])
   endif
+  for header in get(options, 'headers', [])
+    call extend(args, ['-H', header])
+  endfor
   if type(get(options, 'data', '')) != type('')
     call extend(args, ['-d', rhubarb#json_generate(options.data)])
   elseif has_key(options, 'data')
