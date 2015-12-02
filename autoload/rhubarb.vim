@@ -184,7 +184,7 @@ endfunction
 " Section: Fugitive :Gbrowse support
 
 function! rhubarb#fugitive_url(opts, ...) abort
-  if a:0 || type(a:opts) != type({}) || !has_key(a:opts, 'repo') || !has_key(a:opts, 'revision')
+  if a:0 || type(a:opts) != type({}) || !has_key(a:opts, 'repo')
     return ''
   endif
   let root = rhubarb#homepage_for_url(get(a:opts, 'remote'))
@@ -208,14 +208,8 @@ function! rhubarb#fugitive_url(opts, ...) abort
   elseif path =~# '^\.git\>'
     return root
   endif
-  if a:opts.revision =~# '^[[:alnum:]._-]\+:'
-    let commit = matchstr(a:opts.revision,'^[^:]*')
-  elseif a:opts.commit =~# '^\d\=$'
-    let local = matchstr(a:opts.repo.head_ref(),'\<refs/heads/\zs.*')
-    let commit = a:opts.repo.git_chomp('config','branch.'.local.'.merge')[11:-1]
-    if commit ==# ''
-      let commit = local
-    endif
+  if a:opts.commit =~# '^\d\=$'
+    let commit = a:opts.repo.rev_parse('HEAD')
   else
     let commit = a:opts.commit
   endif
