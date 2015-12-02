@@ -191,7 +191,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
   if empty(root)
     return ''
   endif
-  let path = a:opts.path
+  let path = substitute(a:opts.path, '^/', '', '')
   if path =~# '^\.git/refs/heads/'
     let branch = a:opts.repo.git_chomp('config','branch.'.path[16:-1].'.merge')[11:-1]
     if branch ==# ''
@@ -219,7 +219,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
   else
     let commit = a:opts.commit
   endif
-  if a:opts.type == 'tree'
+  if get(a:opts, 'type', '') ==# 'tree' || a:opts.path =~# '/$'
     let url = substitute(root . '/tree/' . commit . '/' . path, '/$', '', 'g')
   elseif a:opts.type == 'blob'
     let url = root . '/blob/' . commit . '/' . path
