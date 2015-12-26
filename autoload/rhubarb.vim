@@ -215,7 +215,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
   endif
   if get(a:opts, 'type', '') ==# 'tree' || a:opts.path =~# '/$'
     let url = substitute(root . '/tree/' . commit . '/' . path, '/$', '', 'g')
-  elseif a:opts.type == 'blob'
+  elseif get(a:opts, 'type', '') ==# 'blob' || a:opts.path =~# '[^/]$'
     let url = root . '/blob/' . commit . '/' . path
     if get(a:opts, 'line2') && a:opts.line1 == a:opts.line2
       let url .= '#L' . a:opts.line1
