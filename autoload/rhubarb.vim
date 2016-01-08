@@ -116,6 +116,8 @@ function! s:curl_arguments(path, ...) abort
     call extend(args, ['-H', 'Authorization: bearer ' . g:RHUBARB_TOKEN])
   elseif s:credentials() !~# '^[^:]*:$'
     call extend(args, ['-u', s:credentials()])
+  elseif has('win32') && filereadable(expand('~/.netrc'))
+    call extend(args, ['--netrc-file', expand('~/.netrc')])
   else
     call extend(args, ['--netrc'])
   endif
