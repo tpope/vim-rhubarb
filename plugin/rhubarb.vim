@@ -11,14 +11,21 @@ if !exists('g:dispatch_compilers')
 endif
 let g:dispatch_compilers['hub'] = 'git'
 
+function! s:config() abort
+  let common_dir = fugitive#buffer().repo().dir('commondir')
+  if filereadable(common_dir)
+    return fugitive#buffer().repo().dir(readfile(common_dir)[0] . '/config')
+  endif
+  return fugitive#buffer().repo().dir('config')
+endfunction
+
 augroup rhubarb
   autocmd!
   autocmd User Fugitive
         \ if expand('%:p') =~# '\.git[\/].*MSG$' &&
         \   exists('+omnifunc') &&
         \   &omnifunc =~# '^\%(syntaxcomplete#Complete\)\=$' &&
-        \   !empty(filter(
-        \     readfile(fugitive#buffer().repo().dir('config')),
+        \   !empty(filter(readfile(s:config()),
         \     '!empty(rhubarb#homepage_for_url(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs\S*'')))')) |
         \   setlocal omnifunc=rhubarb#omnifunc |
         \ endif
