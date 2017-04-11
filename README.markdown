@@ -6,6 +6,9 @@ of features:
 * Enables `:Gbrowse` from fugitive.vim to open GitHub URLs.  (`:Gbrowse`
   currently has native support for this, but it is slated to be removed.)
 
+* Sets up `:Git` to use [`hub`](https://github.com/github/hub) if installed
+  rather than `git`.
+
 * In commit messages, GitHub issues, issue URLs, and collaborators can be
   omni-completed (`<C-X><C-O>`, see `:help compl-omni`).  This makes inserting
   those `Closes #123` remarks slightly easier than copying and pasting from
