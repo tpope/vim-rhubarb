@@ -24,7 +24,7 @@ then simply copy and paste:
     vim -u NONE -c "helptags vim-rhubarb/doc" -c q
 
 In addition to [fugitive.vim][], [Curl](http://curl.haxx.se/) is
-required (included with OS X).
+required (included with macOS).
 
 Provide your GitHub credentials by adding them to your netrc:
 
