@@ -227,5 +227,5 @@ function! rhubarb#fugitive_url(opts, ...) abort
   else
     let url = root . '/commit/' . commit
   endif
-  return url
+  return substitute(url, '#', '%23', 'g')
 endfunction
