@@ -119,7 +119,8 @@ function! s:curl_arguments(path, ...) abort
   elseif has('win32') && filereadable(expand('~/.netrc'))
     call extend(args, ['--netrc-file', expand('~/.netrc')])
   else
-    call extend(args, ['--netrc'])
+    call extend(args, has('win32') && filereadable(expand('~/.netrc'))
+          \ ? ['--netrc-file', expand('~/.netrc')] : ['--netrc'])
   endif
   if has_key(options, 'method')
     call extend(args, ['-X', toupper(options.method)])
