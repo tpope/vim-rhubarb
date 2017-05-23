@@ -3,8 +3,7 @@
 If [fugitive.vim][] is the Git, rhubarb.vim is the Hub.  Here's the full list
 of features:
 
-* Enables `:Gbrowse` from fugitive.vim to open GitHub URLs.  (`:Gbrowse`
-  currently has native support for this, but it is slated to be removed.)
+* Enables `:Gbrowse` from fugitive.vim to open GitHub URLs.
 
 * Sets up `:Git` to use [`hub`](https://github.com/github/hub) if installed
   rather than `git`.
