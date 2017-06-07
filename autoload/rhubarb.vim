@@ -138,7 +138,7 @@ function! s:curl_arguments(path, ...) abort
   elseif has_key(options, 'data')
     call extend(args, ['-d', options.data])
   endif
-  call add(args, a:path =~# '://' ? a:path : 'https://api.github.com'.a:path)
+  call add(args, a:path)
   return args
 endfunction
 
@@ -146,8 +146,21 @@ function! rhubarb#request(path, ...) abort
   if !executable('curl')
     call s:throw('cURL is required')
   endif
+  if a:path =~# '://'
+    let path = a:path
+  elseif a:path =~# '^/'
+    let path = 'https://api.github.com' . a:path
+  else
+    let base = s:repo_homepage()
+    let path = substitute(a:path, '%s', matchstr(base, '[^/]\+/[^/]\+$'), '')
+    if base =~# '//github\.com/'
+      let path = 'https://api.github.com/' . path
+    else
+      let path = substitute(base, '[^/]\+/[^/]\+$', 'api/v3/', '') . path
+    endif
+  endif
   let options = a:0 ? a:1 : {}
-  let args = s:curl_arguments(a:path, options)
+  let args = s:curl_arguments(path, options)
   let raw = system('curl '.join(map(copy(args), 's:shellesc(v:val)'), ' '))
   if raw ==# ''
     return raw
@@ -157,13 +170,7 @@ function! rhubarb#request(path, ...) abort
 endfunction
 
 function! rhubarb#repo_request(...) abort
-  let base = s:repo_homepage()
-  if base =~# '//github\.com/'
-    let base = substitute(base, '//github\.com/', '//api.github.com/repos/', '')
-  else
-    let base = substitute(base, '//[^/]\+/\zs', 'api/v3/repos/', '')
-  endif
-  return rhubarb#request(base . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
+  return rhubarb#request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
 endfunction
 
 " Section: Issues
