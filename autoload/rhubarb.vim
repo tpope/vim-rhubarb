@@ -173,23 +173,42 @@ function! rhubarb#repo_request(...) abort
   return rhubarb#request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
 endfunction
 
+function! s:url_encode(str) abort
+  return substitute(a:str, '[?@=&<>%#/:+[:space:]]', '\=submatch(0)==" "?"+":printf("%%%02X", char2nr(submatch(0)))', 'g')
+endfunction
+
+function! rhubarb#repo_search(type, q) abort
+  return rhubarb#request('search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q))
+endfunction
+
 " Section: Issues
 
+let s:reference = '\<\%(\c\%(clos\|resolv\|referenc\)e[sd]\=\|\cfix\%(e[sd]\)\=\)\>'
 function! rhubarb#omnifunc(findstart,base) abort
   if a:findstart
-    let existing = matchstr(getline('.')[0:col('.')-1],'#\d*$\|@[[:alnum:]-]*$')
+    let existing = matchstr(getline('.')[0:col('.')-1],s:reference.'\s\+\zs[^#/,.;]*$\|[#@[:alnum:]-]*$')
     return col('.')-1-strlen(existing)
   endif
   try
     if a:base =~# '^@'
       return map(rhubarb#repo_request('collaborators'), '"@".v:val.login')
     else
-      let prefix = (a:base =~# '^#' ? '#' : s:repo_homepage().'/issues/')
-      let issues = rhubarb#repo_request('issues')
-      if type(issues) == type({})
-        call s:throw(get(issues, 'message', 'unknown error'))
+      if a:base =~# '^#'
+        let prefix = '#'
+        let query = ''
+      else
+        let prefix = s:repo_homepage().'/issues/'
+        let query = a:base
       endif
-      return map(issues, '{"word": prefix.v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+      let response = rhubarb#repo_search('issues', 'state:open '.query)
+      if type(response) != type({})
+        call s:throw('unknown error')
+      elseif has_key(response, 'message')
+        call s:throw(response[message])
+      else
+        let issues = get(response, 'items', [])
+      endif
+      return map(issues, '{"word": prefix.v:val.number, "abbr": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
     endif
   catch /^\%(fugitive\|rhubarb\):/
     echoerr v:errmsg
