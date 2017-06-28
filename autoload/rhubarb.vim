@@ -204,7 +204,7 @@ function! rhubarb#omnifunc(findstart,base) abort
       if type(response) != type({})
         call s:throw('unknown error')
       elseif has_key(response, 'message')
-        call s:throw(response[message])
+        call s:throw(response.message)
       else
         let issues = get(response, 'items', [])
       endif
