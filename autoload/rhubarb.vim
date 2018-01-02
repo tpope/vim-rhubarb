@@ -31,6 +31,17 @@ function! rhubarb#homepage_for_url(url) abort
     let domain_pattern .= '\|' . escape(split(domain, '://')[-1], '.')
   endfor
   let base = matchstr(a:url, '^\%(https\=://\|git://\|git@\|ssh://git@\)\=\zs\('.domain_pattern.'\)[/:].\{-\}\ze\%(\.git\)\=$')
+  if empty(base)
+    let index = stridx(a:url, ':')
+    if index > 0
+      let protocol = a:url[0:index-1]
+      let domain = system("ssh -GT ".protocol." | grep '^hostname '")[9:-2]
+      if !empty(domain)
+        let path = a:url[index+1:-1]
+        let base = matchstr(domain.'/'.path, '^\('.domain_pattern.'\)[/:].\{-\}\ze\%(\.git\)\=$')
+      endif
+    endif
+  endif
   if index(domains, 'http://' . matchstr(base, '^[^:/]*')) >= 0
     return 'http://' . tr(base, ':', '/')
   elseif !empty(base)
