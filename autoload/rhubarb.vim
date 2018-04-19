@@ -14,7 +14,7 @@ function! s:throw(string) abort
 endfunction
 
 function! s:shellesc(arg) abort
-  if a:arg =~ '^[A-Za-z0-9_/.-]\+$'
+  if a:arg =~# '^[A-Za-z0-9_/.-]\+$'
     return a:arg
   elseif &shell =~# 'cmd' && a:arg !~# '"'
     return '"'.a:arg.'"'
