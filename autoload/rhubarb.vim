@@ -238,7 +238,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
     return root
   endif
   if a:opts.commit =~# '^\d\=$'
-    let commit = a:opts.repo.rev_parse('HEAD')
+    return ''
   else
     let commit = a:opts.commit
   endif
