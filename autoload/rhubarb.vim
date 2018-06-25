@@ -227,12 +227,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
   endif
   let path = substitute(a:opts.path, '^/', '', '')
   if path =~# '^\.git/refs/heads/'
-    let branch = a:opts.repo.git_chomp('config','branch.'.path[16:-1].'.merge')[11:-1]
-    if branch ==# ''
-      return root . '/commits/' . path[16:-1]
-    else
-      return root . '/commits/' . branch
-    endif
+    return root . '/commits/' . path[16:-1]
   elseif path =~# '^\.git/refs/tags/'
     return root . '/releases/tag/' . path[15:-1]
   elseif path =~# '^\.git/refs/remotes/[^/]\+/.'
