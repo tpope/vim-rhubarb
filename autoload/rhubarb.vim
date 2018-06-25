@@ -237,7 +237,7 @@ function! rhubarb#fugitive_url(opts, ...) abort
     return root . '/releases/tag/' . path[15:-1]
   elseif path =~# '^\.git/refs/remotes/[^/]\+/.'
     return root . '/commits/' . matchstr(path,'remotes/[^/]\+/\zs.*')
-  elseif path =~# '.git/\%(config$\|hooks\>\)'
+  elseif path =~# '^\.git/\%(config$\|hooks\>\)'
     return root . '/admin'
   elseif path =~# '^\.git\>'
     return root
