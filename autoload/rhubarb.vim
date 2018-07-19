@@ -44,13 +44,17 @@ function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
   endif
-  let repo = fugitive#repo()
-  let homepage = rhubarb#homepage_for_url(repo.config('remote.origin.url'))
+  if exists('*fugitive#RemoteUrl')
+    let remote = fugitive#RemoteUrl()
+  else
+    let remote = fugitive#repo().config('remote.origin.url')
+  endif
+  let homepage = rhubarb#homepage_for_url(remote)
   if !empty(homepage)
     let b:rhubarb_homepage = homepage
     return b:rhubarb_homepage
   endif
-  call s:throw('origin is not a GitHub repository')
+  call s:throw((len(remote) ? remote : 'origin') . ' is not a GitHub repository')
 endfunction
 
 " Section: HTTP
