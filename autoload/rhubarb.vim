@@ -44,8 +44,8 @@ function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
   endif
-  if exists('*fugitive#RemoteUrl')
-    let remote = fugitive#RemoteUrl()
+  if exists('*FugitiveRemoteUrl')
+    let remote = FugitiveRemoteUrl()
   else
     let remote = fugitive#repo().config('remote.origin.url')
   endif
