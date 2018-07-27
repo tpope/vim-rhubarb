@@ -16,11 +16,16 @@ if get(g:, 'fugitive_git_command', 'git') ==# 'git' && executable('hub')
 endif
 
 function! s:config() abort
-  let common_dir = fugitive#buffer().repo().dir('commondir')
-  if filereadable(common_dir)
-    return fugitive#buffer().repo().dir(readfile(common_dir)[0] . '/config')
+  if exists('*FugitiveCommonDir')
+    let dir = FugitiveCommonDir()
+  else
+    let dir = get(b:, 'git_dir', '')
+    let common_dir = b:git_dir . '/commondir'
+    if filereadable(dir . '/commondir')
+      let dir .= '/' . readfile(common_dir)[0]
+    endif
   endif
-  return fugitive#buffer().repo().dir('config')
+  return filereadable(dir . '/config') ? readfile(dir . '/config') : []
 endfunction
 
 augroup rhubarb
@@ -29,7 +34,7 @@ augroup rhubarb
         \ if expand('%:p') =~# '\.git[\/].*MSG$' &&
         \   exists('+omnifunc') &&
         \   &omnifunc =~# '^\%(syntaxcomplete#Complete\)\=$' &&
-        \   !empty(filter(readfile(s:config()),
+        \   !empty(filter(s:config(),
         \     '!empty(rhubarb#homepage_for_url(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs\S*'')))')) |
         \   setlocal omnifunc=rhubarb#omnifunc |
         \ endif
