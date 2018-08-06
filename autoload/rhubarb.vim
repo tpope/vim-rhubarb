@@ -214,6 +214,8 @@ function! rhubarb#omnifunc(findstart,base) abort
       endif
       return map(issues, '{"word": prefix.v:val.number, "abbr": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
     endif
+  catch /^rhubarb:.*is not a GitHub repository/
+    return []
   catch /^\%(fugitive\|rhubarb\):/
     echoerr v:errmsg
   endtry
