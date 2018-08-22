@@ -23,7 +23,7 @@ function! s:shellesc(arg) abort
   endif
 endfunction
 
-function! rhubarb#homepage_for_url(url) abort
+function! rhubarb#HomepageForUrl(url) abort
   let domain_pattern = 'github\.com'
   let domains = get(g:, 'github_enterprise_urls', get(g:, 'fugitive_github_domains', []))
   call map(copy(domains), 'substitute(v:val, "/$", "", "")')
@@ -40,6 +40,10 @@ function! rhubarb#homepage_for_url(url) abort
   endif
 endfunction
 
+function! rhubarb#homepage_for_url(url) abort
+  return rhubarb#HomepageForUrl(a:url)
+endfunction
+
 function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
@@ -49,7 +53,7 @@ function! s:repo_homepage() abort
   else
     let remote = fugitive#repo().config('remote.origin.url')
   endif
-  let homepage = rhubarb#homepage_for_url(remote)
+  let homepage = rhubarb#HomepageForUrl(remote)
   if !empty(homepage)
     let b:rhubarb_homepage = homepage
     return b:rhubarb_homepage
@@ -78,7 +82,7 @@ function! s:credentials() abort
   return g:github_user.':'.g:github_password
 endfunction
 
-function! rhubarb#json_parse(string) abort
+function! rhubarb#JsonDecode(string) abort
   if exists('*json_decode')
     return json_decode(a:string)
   endif
@@ -93,18 +97,18 @@ function! rhubarb#json_parse(string) abort
   call s:throw("invalid JSON: ".a:string)
 endfunction
 
-function! rhubarb#json_generate(object) abort
+function! rhubarb#JsonEncode(object) abort
   if exists('*json_encode')
     return json_encode(a:object)
   endif
   if type(a:object) == type('')
     return '"' . substitute(a:object, "[\001-\031\"\\\\]", '\=printf("\\u%04x", char2nr(submatch(0)))', 'g') . '"'
   elseif type(a:object) == type([])
-    return '['.join(map(copy(a:object), 'rhubarb#json_generate(v:val)'),', ').']'
+    return '['.join(map(copy(a:object), 'rhubarb#JsonEncode(v:val)'),', ').']'
   elseif type(a:object) == type({})
     let pairs = []
     for key in keys(a:object)
-      call add(pairs, rhubarb#json_generate(key) . ': ' . rhubarb#json_generate(a:object[key]))
+      call add(pairs, rhubarb#JsonEncode(key) . ': ' . rhubarb#JsonEncode(a:object[key]))
     endfor
     return '{' . join(pairs, ', ') . '}'
   else
@@ -138,7 +142,7 @@ function! s:curl_arguments(path, ...) abort
     call extend(args, ['-H', header])
   endfor
   if type(get(options, 'data', '')) != type('')
-    call extend(args, ['-d', rhubarb#json_generate(options.data)])
+    call extend(args, ['-d', rhubarb#JsonEncode(options.data)])
   elseif has_key(options, 'data')
     call extend(args, ['-d', options.data])
   endif
@@ -146,7 +150,7 @@ function! s:curl_arguments(path, ...) abort
   return args
 endfunction
 
-function! rhubarb#request(path, ...) abort
+function! rhubarb#Request(path, ...) abort
   if !executable('curl')
     call s:throw('cURL is required')
   endif
@@ -169,33 +173,45 @@ function! rhubarb#request(path, ...) abort
   if raw ==# ''
     return raw
   else
-    return rhubarb#json_parse(raw)
+    return rhubarb#JsonDecode(raw)
   endif
 endfunction
 
+function! rhubarb#request(...) abort
+  return call('rhubarb#Request', a:000)
+endfunction
+
+function! rhubarb#RepoRequest(...) abort
+  return rhubarb#Request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
+endfunction
+
 function! rhubarb#repo_request(...) abort
-  return rhubarb#request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
+  return call('rhubarb#RepoRequest', a:000)
 endfunction
 
 function! s:url_encode(str) abort
   return substitute(a:str, '[?@=&<>%#/:+[:space:]]', '\=submatch(0)==" "?"+":printf("%%%02X", char2nr(submatch(0)))', 'g')
 endfunction
 
-function! rhubarb#repo_search(type, q) abort
-  return rhubarb#request('search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q))
+function! rhubarb#RepoSearch(type, q) abort
+  return rhubarb#Request('search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q))
+endfunction
+
+function! rhubarb#repo_search(...) abort
+  return call('rhubarb#RepoSearch', a:000)
 endfunction
 
 " Section: Issues
 
 let s:reference = '\<\%(\c\%(clos\|resolv\|referenc\)e[sd]\=\|\cfix\%(e[sd]\)\=\)\>'
-function! rhubarb#omnifunc(findstart,base) abort
+function! rhubarb#Complete(findstart, base) abort
   if a:findstart
     let existing = matchstr(getline('.')[0:col('.')-1],s:reference.'\s\+\zs[^#/,.;]*$\|[#@[:alnum:]-]*$')
     return col('.')-1-strlen(existing)
   endif
   try
     if a:base =~# '^@'
-      return map(rhubarb#repo_request('collaborators'), '"@".v:val.login')
+      return map(rhubarb#RepoRequest('collaborators'), '"@".v:val.login')
     else
       if a:base =~# '^#'
         let prefix = '#'
@@ -204,7 +220,7 @@ function! rhubarb#omnifunc(findstart,base) abort
         let prefix = s:repo_homepage().'/issues/'
         let query = a:base
       endif
-      let response = rhubarb#repo_search('issues', 'state:open '.query)
+      let response = rhubarb#RepoSearch('issues', 'state:open '.query)
       if type(response) != type({})
         call s:throw('unknown error')
       elseif has_key(response, 'message')
@@ -221,9 +237,13 @@ function! rhubarb#omnifunc(findstart,base) abort
   endtry
 endfunction
 
+function! rhubarb#omnifunc(findstart, base) abort
+  return rhubarb#Complete(a:findstart, a:base)
+endfunction
+
 " Section: Fugitive :Gbrowse support
 
-function! rhubarb#fugitive_url(opts, ...) abort
+function! rhubarb#FugitiveUrl(opts, ...) abort
   if a:0 || type(a:opts) != type({})
     return ''
   endif
@@ -262,3 +282,9 @@ function! rhubarb#fugitive_url(opts, ...) abort
   endif
   return url
 endfunction
+
+function! rhubarb#fugitive_url(...) abort
+  return call('rhubarb#FugitiveUrl', a:000)
+endfunction
+
+" Section: End
