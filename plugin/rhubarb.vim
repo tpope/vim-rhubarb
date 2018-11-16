@@ -18,8 +18,8 @@ endif
 function! s:Config() abort
   if exists('*FugitiveCommonDir')
     let dir = FugitiveCommonDir()
-  elseif exists('*FugitiveRoute')
-    let dir = FugitiveRoute('.git/config')[0:-8]
+  elseif exists('*FugitiveFind')
+    let dir = FugitiveFind('.git/config')[0:-8]
   else
     let dir = get(b:, 'git_dir', '')
     let common_dir = b:git_dir . '/commondir'
