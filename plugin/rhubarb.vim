@@ -44,7 +44,10 @@ augroup rhubarb
         \ if expand('%') ==# '' && &previewwindow && pumvisible() && getbufvar('#', '&omnifunc') ==# 'rhubarb#omnifunc' |
         \    setlocal nolist linebreak filetype=markdown |
         \ endif
-  autocmd BufNewFile,BufRead *.git/{PULLREQ_EDIT,ISSUE_EDIT,RELEASE_EDIT}MSG set ft=gitcommit
+  autocmd BufNewFile,BufRead *.git/{PULLREQ_EDIT,ISSUE_EDIT,RELEASE_EDIT}MSG
+        \ if &ft ==# '' || &ft ==# 'conf' |
+        \   set ft=gitcommit
+        \ endif
 augroup END
 
 if !exists('g:fugitive_browse_handlers')
