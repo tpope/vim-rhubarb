@@ -46,7 +46,7 @@ augroup rhubarb
         \ endif
   autocmd BufNewFile,BufRead *.git/{PULLREQ_EDIT,ISSUE_EDIT,RELEASE_EDIT}MSG
         \ if &ft ==# '' || &ft ==# 'conf' |
-        \   set ft=gitcommit
+        \   set ft=gitcommit |
         \ endif
 augroup END
 
