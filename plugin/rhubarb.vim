@@ -16,9 +16,7 @@ if get(g:, 'fugitive_git_command', 'git') ==# 'git' && executable('hub')
 endif
 
 function! s:Config() abort
-  if exists('*FugitiveCommonDir')
-    let dir = FugitiveCommonDir()
-  elseif exists('*FugitiveFind')
+  if exists('*FugitiveFind')
     let dir = FugitiveFind('.git/config')[0:-8]
   else
     let dir = get(b:, 'git_dir', '')
