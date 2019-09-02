@@ -243,15 +243,17 @@ endfunction
 
 " Section: Fugitive :Gbrowse support
 
-function! rhubarb#FugitiveUrl(opts, ...) abort
-  if a:0 || type(a:opts) != type({})
+function! rhubarb#FugitiveUrl(...) abort
+  if a:0 == 1 || type(a:1) == type({})
+    let opts = a:1
+    let root = rhubarb#HomepageForUrl(get(opts, 'remote', ''))
+  else
     return ''
   endif
-  let root = rhubarb#homepage_for_url(get(a:opts, 'remote'))
   if empty(root)
     return ''
   endif
-  let path = substitute(a:opts.path, '^/', '', '')
+  let path = substitute(opts.path, '^/', '', '')
   if path =~# '^\.git/refs/heads/'
     return root . '/commits/' . path[16:-1]
   elseif path =~# '^\.git/refs/tags/'
@@ -263,20 +265,20 @@ function! rhubarb#FugitiveUrl(opts, ...) abort
   elseif path =~# '^\.git\>'
     return root
   endif
-  if a:opts.commit =~# '^\d\=$'
+  if opts.commit =~# '^\d\=$'
     return ''
   else
-    let commit = a:opts.commit
+    let commit = opts.commit
   endif
-  if get(a:opts, 'type', '') ==# 'tree' || a:opts.path =~# '/$'
+  if get(opts, 'type', '') ==# 'tree' || opts.path =~# '/$'
     let url = substitute(root . '/tree/' . commit . '/' . path, '/$', '', 'g')
-  elseif get(a:opts, 'type', '') ==# 'blob' || a:opts.path =~# '[^/]$'
+  elseif get(opts, 'type', '') ==# 'blob' || opts.path =~# '[^/]$'
     let escaped_commit = substitute(commit, '#', '%23', 'g')
     let url = root . '/blob/' . escaped_commit . '/' . path
-    if get(a:opts, 'line2') && a:opts.line1 == a:opts.line2
-      let url .= '#L' . a:opts.line1
-    elseif get(a:opts, 'line2')
-      let url .= '#L' . a:opts.line1 . '-L' . a:opts.line2
+    if get(opts, 'line2') && opts.line1 == opts.line2
+      let url .= '#L' . opts.line1
+    elseif get(opts, 'line2')
+      let url .= '#L' . opts.line1 . '-L' . opts.line2
     endif
   else
     let url = root . '/commit/' . commit
