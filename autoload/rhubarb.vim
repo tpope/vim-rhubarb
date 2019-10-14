@@ -66,8 +66,8 @@ endfunction
 function! s:credentials() abort
   if !exists('g:github_user')
     let g:github_user = $GITHUB_USER
-    if g:github_user ==# ''
-      let g:github_user = system('git config --get github.user')[0:-2]
+    if g:github_user ==# '' && exists('*FugitiveConfig')
+      let g:github_user = FugitiveConfig('github.user', '')
     endif
     if g:github_user ==# ''
       let g:github_user = $LOGNAME
@@ -75,8 +75,8 @@ function! s:credentials() abort
   endif
   if !exists('g:github_password')
     let g:github_password = $GITHUB_PASSWORD
-    if g:github_password ==# ''
-      let g:github_password = system('git config --get github.password')[0:-2]
+    if g:github_password ==# '' && exists('*FugitiveConfig')
+      let g:github_password = FugitiveConfig('github.password', '')
     endif
   endif
   return g:github_user.':'.g:github_password
