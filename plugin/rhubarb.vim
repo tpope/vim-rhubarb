@@ -11,8 +11,12 @@ if !exists('g:dispatch_compilers')
 endif
 let g:dispatch_compilers['hub'] = 'git'
 
+if !exists('g:rhubarb_git_command')
+  let g:rhubarb_git_command = 'hub'
+endif
+
 if get(g:, 'fugitive_git_command', 'git') ==# 'git' && executable('hub')
-  let g:fugitive_git_command = 'hub'
+  let g:fugitive_git_command = &g:rhubarb_git_command
 endif
 
 function! s:Config() abort
