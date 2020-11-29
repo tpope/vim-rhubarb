@@ -11,7 +11,7 @@ if !exists('g:dispatch_compilers')
 endif
 let g:dispatch_compilers['hub'] = 'git'
 
-if get(g:, 'fugitive_git_command', 'git') ==# 'git' && executable('hub')
+if !exists('g:fugitive_git_command') && executable('hub')
   let g:fugitive_git_command = 'hub'
 endif
 
