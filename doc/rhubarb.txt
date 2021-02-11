@@ -6,7 +6,7 @@ License: Same terms as Vim itself (see |license|)
 Use |i_CTRL-X_CTRL-O| to omni-complete GitHub issues or project collaborator
 usernames when editing a commit message.
 
-Use Fugitive's |:Gbrowse| to browse to the GitHub URL for the current buffer.
+Use Fugitive's |:GBrowse| to browse to the GitHub URL for the current buffer.
 
 ABOUT                                           *rhubarb-about*
 

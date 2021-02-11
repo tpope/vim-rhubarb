@@ -240,7 +240,7 @@ function! rhubarb#omnifunc(findstart, base) abort
   return rhubarb#Complete(a:findstart, a:base)
 endfunction
 
-" Section: Fugitive :Gbrowse support
+" Section: Fugitive :GBrowse support
 
 function! rhubarb#FugitiveUrl(...) abort
   if a:0 == 1 || type(a:1) == type({})

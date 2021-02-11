@@ -3,7 +3,7 @@
 If [fugitive.vim][] is the Git, rhubarb.vim is the Hub.  Here's the full list
 of features:
 
-* Enables `:Gbrowse` from fugitive.vim to open GitHub URLs.
+* Enables `:GBrowse` from fugitive.vim to open GitHub URLs.
 
 * Sets up `:Git` to use [`hub`](https://github.com/github/hub) if installed
   rather than `git`.
@@ -28,7 +28,7 @@ then simply copy and paste:
 You'll also need [fugitive.vim][].
 
 [Curl](http://curl.haxx.se/) (included with macOS) is required for features
-that use the GitHub API (i.e., `:Gbrowse` doesn't need it).
+that use the GitHub API (i.e., `:GBrowse` doesn't need it).
 [Generate a personal access token](https://github.com/settings/tokens/new)
 with repo permissions and add it to your `.netrc`:
 
