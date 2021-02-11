@@ -11,10 +11,6 @@ if !exists('g:dispatch_compilers')
 endif
 let g:dispatch_compilers['hub'] = 'git'
 
-if !exists('g:fugitive_git_command') && executable('hub')
-  let g:fugitive_git_command = 'hub'
-endif
-
 function! s:Config() abort
   if exists('*FugitiveFind')
     let dir = FugitiveFind('.git/config')[0:-8]
