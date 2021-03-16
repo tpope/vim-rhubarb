@@ -227,7 +227,7 @@ function! rhubarb#Complete(findstart, base) abort
       else
         let issues = get(response, 'items', [])
       endif
-      return map(issues, '{"word": prefix.v:val.number, "abbr": "#".v:val.number, "menu": v:val.title, "info": substitute(v:val.body,"\\r","","g")}')
+      return map(issues, '{"word": prefix.v:val.number, "abbr": "#".v:val.number, "menu": v:val.title, "info": substitute(empty(v:val.body) ? "\n" : v:val.body,"\\r","","g")}')
     endif
   catch /^rhubarb:.*is not a GitHub repository/
     return []
