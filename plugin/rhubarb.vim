@@ -14,14 +14,10 @@ let g:dispatch_compilers['hub'] = 'git'
 function! s:Config() abort
   if exists('*FugitiveFind')
     let dir = FugitiveFind('.git/config')[0:-8]
+    return filereadable(dir . '/config') ? readfile(dir . '/config') : []
   else
-    let dir = get(b:, 'git_dir', '')
-    let common_dir = b:git_dir . '/commondir'
-    if filereadable(dir . '/commondir')
-      let dir .= '/' . readfile(common_dir)[0]
-    endif
+    return []
   endif
-  return filereadable(dir . '/config') ? readfile(dir . '/config') : []
 endfunction
 
 augroup rhubarb

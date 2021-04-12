@@ -47,11 +47,7 @@ function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
   endif
-  if exists('*FugitiveRemoteUrl')
-    let remote = FugitiveRemoteUrl()
-  else
-    let remote = fugitive#repo().config('remote.origin.url')
-  endif
+  let remote = FugitiveRemoteUrl()
   let homepage = rhubarb#HomepageForUrl(remote)
   if !empty(homepage)
     let b:rhubarb_homepage = homepage
