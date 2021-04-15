@@ -14,10 +14,14 @@ let g:dispatch_compilers['hub'] = 'git'
 function! s:SetUpMessage(filename) abort
   if &omnifunc !~# '^\%(syntaxcomplete#Complete\)\=$' ||
         \ a:filename !~# '\.git[\/].*MSG$' ||
-        \ !exists('*FugitiveFind') || empty(FugitiveGitDir())
+        \ !exists('*FugitiveFind')
     return
   endif
-  let config_file = FugitiveFind('.git/config')
+  let dir = exists('*FugitiveConfigGetRegexp') ? FugitiveGitDir() : FugitiveExtractGitDir(a:filename)
+  if empty(dir)
+    return
+  endif
+  let config_file = FugitiveFind('.git/config', dir)
   let config = filereadable(config_file) ? readfile(config_file) : []
   if !empty(filter(config,
         \ '!empty(rhubarb#HomepageForUrl(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs\S*'')))'))
@@ -28,7 +32,7 @@ endfunction
 augroup rhubarb
   autocmd!
   if exists('+omnifunc')
-    autocmd User Fugitive call s:SetUpMessage(expand('%:p'))
+    autocmd FileType gitcommit call s:SetUpMessage(expand('<afile>:p'))
   endif
   autocmd BufEnter *
         \ if expand('%') ==# '' && &previewwindow && pumvisible() && getbufvar('#', '&omnifunc') ==# 'rhubarb#omnifunc' |
