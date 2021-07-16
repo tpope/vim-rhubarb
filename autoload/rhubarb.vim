@@ -24,19 +24,24 @@ function! s:shellesc(arg) abort
 endfunction
 
 function! rhubarb#HomepageForUrl(url) abort
-  let domain_pattern = 'github\.com'
   let domains = get(g:, 'github_enterprise_urls', get(g:, 'fugitive_github_domains', []))
-  for domain in domains
-    let domain_pattern .= '\|' . escape(split(substitute(domain, '/$', '', ''), '://')[-1], '.')
-  endfor
-  let base = matchstr(a:url, '^\%(https\=://\%([^@/:]*@\)\=\|git://\|git@\|ssh://git@\|org-\d\+@\|ssh://org-\d\+@\)\=\zs\('.domain_pattern.'\)[/:].\{-\}\ze\%(\.git\)\=/\=$')
-  if index(domains, 'http://' . matchstr(base, '^[^:/]*')) >= 0
-    return 'http://' . tr(base, ':', '/')
-  elseif !empty(base)
-    return 'https://' . tr(base, ':', '/')
+  if a:url =~# '://'
+    let match = matchlist(a:url, '^\(https\=://\%([^@/:]*@\)\=\|git://\|ssh://git@\|ssh://org-\d\+@\)\([^/]\+\)/\(.\{-\}\)\%(\.git\)\=/\=$')
+  else
+    let match = matchlist(a:url, '^\(git@\|org-\d\+@\)\([^:/]\+\):\(.\{-\}\)\%(\.git\)\=/\=$')
+  endif
+  if empty(match)
+    return ''
+  elseif match[2] ==# 'github.com' || match[2] =~# '^ssh\.github\.com\%(:443\)\=$'
+    let root = 'https://github.com'
+  elseif index(domains, 'http://' . match[2]) >= 0 || index(domains, match[2]) >= 0 && match[1] =~# '^http://'
+    let root = 'http://' . match[2]
+  elseif index(domains, 'https://' . match[2]) >= 0 || index(domains, match[2]) >= 0
+    let root = 'https://' . match[2]
   else
     return ''
   endif
+  return root . '/' . match[3]
 endfunction
 
 function! rhubarb#homepage_for_url(url) abort
