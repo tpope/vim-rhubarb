@@ -24,7 +24,7 @@ function! s:SetUpMessage(filename) abort
   let config_file = FugitiveFind('.git/config', dir)
   let config = filereadable(config_file) ? readfile(config_file) : []
   if !empty(filter(config,
-        \ '!empty(rhubarb#HomepageForUrl(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs\S*'')))'))
+        \ '!empty(rhubarb#HomepageForUrl(matchstr(v:val, ''^\s*url\s*=\s*"\=\zs[^[:space:]"]*'')))'))
     setlocal omnifunc=rhubarb#Complete
   endif
 endfunction
