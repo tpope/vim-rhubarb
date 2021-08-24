@@ -118,7 +118,7 @@ endfunction
 
 function! s:curl_arguments(path, ...) abort
   let options = a:0 ? a:1 : {}
-  let args = ['-q', '--silent']
+  let args = ['curl', '-q', '--silent']
   call extend(args, ['-H', 'Accept: application/json'])
   call extend(args, ['-H', 'Content-Type: application/json'])
   call extend(args, ['-A', 'rhubarb.vim'])
@@ -169,7 +169,13 @@ function! rhubarb#Request(path, ...) abort
   endif
   let options = a:0 ? a:1 : {}
   let args = s:curl_arguments(path, options)
-  let raw = system('curl '.join(map(copy(args), 's:shellesc(v:val)'), ' '))
+  let raw = system(join(map(copy(args), 's:shellesc(v:val)'), ' '))
+  if has_key(options, 'callback')
+    if !v:shell_error && !empty(raw)
+      call options.callback(rhubarb#JsonDecode(raw))
+    endif
+    return {}
+  endif
   if raw ==# ''
     return raw
   else
@@ -193,8 +199,8 @@ function! s:url_encode(str) abort
   return substitute(a:str, '[?@=&<>%#/:+[:space:]]', '\=submatch(0)==" "?"+":printf("%%%02X", char2nr(submatch(0)))', 'g')
 endfunction
 
-function! rhubarb#RepoSearch(type, q) abort
-  return rhubarb#Request('search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q))
+function! rhubarb#RepoSearch(type, q, ...) abort
+  return call('rhubarb#Request', ['search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q)] + a:000)
 endfunction
 
 function! rhubarb#repo_search(...) abort
