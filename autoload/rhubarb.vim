@@ -69,10 +69,6 @@ function! rhubarb#HomepageForUrl(url) abort
   return substitute(root, '/$', '', '') . '/' . match[4]
 endfunction
 
-function! rhubarb#homepage_for_url(url) abort
-  return rhubarb#HomepageForUrl(a:url)
-endfunction
-
 function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
@@ -223,16 +219,8 @@ function! rhubarb#Request(path, ...) abort
   endif
 endfunction
 
-function! rhubarb#request(...) abort
-  return call('rhubarb#Request', a:000)
-endfunction
-
 function! rhubarb#RepoRequest(...) abort
   return rhubarb#Request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
-endfunction
-
-function! rhubarb#repo_request(...) abort
-  return call('rhubarb#RepoRequest', a:000)
 endfunction
 
 function! s:url_encode(str) abort
@@ -241,10 +229,6 @@ endfunction
 
 function! rhubarb#RepoSearch(type, q, ...) abort
   return call('rhubarb#Request', ['search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q)] + a:000)
-endfunction
-
-function! rhubarb#repo_search(...) abort
-  return call('rhubarb#RepoSearch', a:000)
 endfunction
 
 " Section: Issues
@@ -290,10 +274,6 @@ function! rhubarb#Complete(findstart, base) abort
   endtry
 endfunction
 
-function! rhubarb#omnifunc(findstart, base) abort
-  return rhubarb#Complete(a:findstart, a:base)
-endfunction
-
 " Section: Fugitive :GBrowse support
 
 " https://github.com/github/markup
@@ -337,10 +317,6 @@ function! rhubarb#FugitiveUrl(...) abort
     let url = root . '/commit/' . commit
   endif
   return url
-endfunction
-
-function! rhubarb#fugitive_url(...) abort
-  return call('rhubarb#FugitiveUrl', a:000)
 endfunction
 
 " Section: End
