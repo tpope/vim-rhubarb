@@ -34,7 +34,9 @@ with repo permissions and add it to your `.netrc`:
 If you are using GitHub Enterprise, repeat this step for each domain (omit the
 `api.` portion). You'll also need to tell Rhubarb the root URLs:
 
-    let g:github_enterprise_urls = ['https://example.com']
+    let g:github_enterprise_urls = {
+          \ 'example.com': 'https://example.com',
+          \ }
 
 ## FAQ
 

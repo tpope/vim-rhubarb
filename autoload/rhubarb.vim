@@ -24,24 +24,47 @@ function! s:shellesc(arg) abort
 endfunction
 
 function! rhubarb#HomepageForUrl(url) abort
-  let domains = get(g:, 'github_enterprise_urls', get(g:, 'fugitive_github_domains', []))
-  if a:url =~# '://'
-    let match = matchlist(a:url, '^\(https\=://\%([^@/:]*@\)\=\|git://\|ssh://git@\|ssh://org-\d\+@\)\([^/]\+\)/\(.\{-\}\)\%(\.git\)\=/\=$')
+  let dict_or_list = get(g:, 'github_enterprise_urls', get(g:, 'fugitive_github_domains', {}))
+  if type(dict_or_list) ==# type({})
+    let domains = dict_or_list
+  elseif type(dict_or_list) == type([])
+    let domains = {}
+    for domain in dict_or_list
+      let domains[substitute(domain, '^.\{-\}://', '', '')] = domain
+    endfor
   else
-    let match = matchlist(a:url, '^\(git@\|org-\d\+@\)\([^:/]\+\):\(.\{-\}\)\%(\.git\)\=/\=$')
+    let domains = {}
+  endif
+  " [full_url, scheme, host_with_port, host, path]
+  if a:url =~# '://'
+    let match = matchlist(a:url, '^\(https\=://\|git://\|ssh://\)\%([^@/]\+@\)\=\(\([^/:]\+\)\%(:\d\+\)\=\)/\(.\{-\}\)\%(\.git\)\=/\=$')
+  else
+    let match = matchlist(a:url, '^\([^@/]\+@\)\=\(\([^:/]\+\)\):\(.\{-\}\)\%(\.git\)\=/\=$')
+    let match[1] = 'ssh://'
   endif
   if empty(match)
     return ''
-  elseif match[2] ==# 'github.com' || match[2] =~# '^ssh\.github\.com\%(:443\)\=$'
-    let root = 'https://github.com'
-  elseif index(domains, 'http://' . match[2]) >= 0 || index(domains, match[2]) >= 0 && match[1] =~# '^http://'
-    let root = 'http://' . match[2]
-  elseif index(domains, 'https://' . match[2]) >= 0 || index(domains, match[2]) >= 0
-    let root = 'https://' . match[2]
+  elseif match[3] ==# 'github.com' || match[3] ==# 'ssh.github.com'
+    return 'https://github.com/' . match[4]
+  elseif has_key(domains, match[1] . match[2])
+    let key = match[1] . match[2]
+  elseif has_key(domains, match[2])
+    let key = match[2]
+  elseif has_key(domains, match[3])
+    let key = match[3]
   else
     return ''
   endif
-  return root . '/' . match[3]
+  let root = domains[key]
+  if type(root) !=# type('') && root
+    let root = key
+  endif
+  if empty(root)
+    return ''
+  elseif root !~# '://'
+    let root = (match[1] =~# '^http://' ? 'http://' : 'https://') . root
+  endif
+  return substitute(root, '/$', '', '') . '/' . match[4]
 endfunction
 
 function! rhubarb#homepage_for_url(url) abort
