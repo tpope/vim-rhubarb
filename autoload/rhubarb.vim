@@ -194,6 +194,16 @@ function! rhubarb#Request(path, ...) abort
   endif
   let options = a:0 ? a:1 : {}
   let args = s:curl_arguments(path, options)
+  if exists('*FugitiveExecute') && v:version >= 800
+    try
+      if has_key(options, 'callback')
+        return FugitiveExecute({'argv': args}, { r -> r.exit_status || r.stdout ==# [''] ? '' : options.callback(json_decode(join(r.stdout, ' '))) })
+      endif
+      let raw = join(FugitiveExecute({'argv': args}).stdout, ' ')
+      return empty(raw) ? raw : json_decode(raw)
+    catch /^fugitive:/
+    endtry
+  endif
   let raw = system(join(map(copy(args), 's:shellesc(v:val)'), ' '))
   if has_key(options, 'callback')
     if !v:shell_error && !empty(raw)
