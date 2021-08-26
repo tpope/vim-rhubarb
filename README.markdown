@@ -46,7 +46,7 @@ If you are using GitHub Enterprise, repeat this step for each domain (omit the
 
 Support was dropped partially because [GitHub CLI](https://github.com/cli/cli)
 appears to be unseating it as the preferred GitHub command line solution, and
-partly because `hub` isn't quite a perfect drop-in replacement for `git`,
+partially because `hub` isn't quite a perfect drop-in replacement for `git`,
 making life more difficult for Fugitive.  My recommended solution is to call
 it via a Git alias:
 
