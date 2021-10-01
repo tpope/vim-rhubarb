@@ -291,6 +291,9 @@ function! rhubarb#FugitiveUrl(...) abort
   else
     return ''
   endif
+  if empty(root) && exists('fugitive#RemoteHttpHeaders') && get(fugitive#RemoteHttpHeaders(opts), 'server', '') =~# '^GitHub Babel '
+    let root = matchstr(opts.remote, '^https\=://[^/:@]\+\%(:\d\+\)\=/\(.\{-\}\)\ze\%(\.git\)\=/\=$')
+  endif
   if empty(root)
     return ''
   endif
