@@ -249,6 +249,21 @@ endfunction
 
 " Section: Issues
 
+function! s:CompleteAddIssues(response, prefix) abort
+  for issue in get(a:response, 'items', [])
+    call complete_add({
+          \ 'word': a:prefix . issue.number,
+          \ 'abbr': '#' . issue.number,
+          \ 'menu': issue.title,
+          \ 'info': substitute(empty(issue.body) ? "\n" : issue.body,'\r','','g'),
+          \ })
+  endfor
+  if !has_key(a:response, 'message')
+    return
+  endif
+  throw 'rhubarb: ' . response.message
+endfunction
+
 let s:reference = '\<\%(\c\%(clos\|resolv\|referenc\)e[sd]\=\|\cfix\%(e[sd]\)\=\)\>'
 function! rhubarb#Complete(findstart, base) abort
   if a:findstart
@@ -266,16 +281,10 @@ function! rhubarb#Complete(findstart, base) abort
         let prefix = s:repo_homepage().'/issues/'
         let query = a:base
       endif
-      let response = rhubarb#RepoSearch('issues', 'state:open '.query)
-      if has_key(response, 'message')
-        call s:throw(response.message)
-      else
-        let issues = get(response, 'items', [])
-      endif
-      return map(issues, '{"word": prefix.v:val.number, "abbr": "#".v:val.number, "menu": v:val.title, "info": substitute(empty(v:val.body) ? "\n" : v:val.body,"\\r","","g")}')
+      let response = rhubarb#RepoSearch('issues', 'state:open ' . query)
+      call s:CompleteAddIssues(response, prefix)
     endif
   catch /^rhubarb:.*is not a GitHub repository/
-    return []
   catch /^\%(fugitive\|rhubarb\):/
     echoerr v:errmsg
   endtry
