@@ -197,7 +197,8 @@ function! rhubarb#Request(path, ...) abort
   if exists('*FugitiveExecute') && v:version >= 800
     try
       if has_key(options, 'callback')
-        return FugitiveExecute({'argv': args}, { r -> r.exit_status || r.stdout ==# [''] ? '' : options.callback(json_decode(join(r.stdout, ' '))) })
+        return FugitiveExecute({'argv': args},
+              \ { r -> r.exit_status || r.stdout ==# [''] ? '' : call(options.callback, [json_decode(join(r.stdout, ' '))] + get(options, 'callback_args', [])) })
       endif
       let raw = join(FugitiveExecute({'argv': args}).stdout, ' ')
       return empty(raw) ? raw : json_decode(raw)
@@ -207,7 +208,7 @@ function! rhubarb#Request(path, ...) abort
   let raw = system(join(map(copy(args), 's:shellesc(v:val)'), ' '))
   if has_key(options, 'callback')
     if !v:shell_error && !empty(raw)
-      call options.callback(rhubarb#JsonDecode(raw))
+      call call(options.callback, [rhubarb#JsonDecode(raw)] + get(options, 'callback_args', []))
     endif
     return {}
   endif
