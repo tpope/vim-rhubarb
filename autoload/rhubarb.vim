@@ -307,13 +307,14 @@ function! rhubarb#FugitiveUrl(...) abort
     return ''
   endif
   let path = substitute(opts.path, '^/', '', '')
-  if path =~# '^\.git/refs/heads/'
-    return root . '/commits/' . path[16:-1]
-  elseif path =~# '^\.git/refs/tags/'
-    return root . '/releases/tag/' . path[15:-1]
-  elseif path =~# '^\.git/refs/remotes/[^/]\+/.'
-    return root . '/commits/' . matchstr(path,'remotes/[^/]\+/\zs.*')
-  elseif path =~# '^\.git\>'
+  let ref = matchstr(opts.path, '^/\=\.git/\zsrefs/.*')
+  if ref =~# '^refs/heads/'
+    return root . '/commits/' . ref[11:-1]
+  elseif ref =~# '^refs/tags/'
+    return root . '/releases/tag/' . ref[10:-1]
+  elseif ref =~# '^refs/remotes/[^/]\+/.'
+    return root . '/commits/' . matchstr(ref,'remotes/[^/]\+/\zs.*')
+  elseif opts.path =~# '^/\=\.git\>'
     return root
   endif
   let commit = opts.commit
