@@ -261,7 +261,7 @@ function! s:CompleteAddIssues(response, prefix) abort
   if !has_key(a:response, 'message')
     return
   endif
-  throw 'rhubarb: ' . response.message
+  throw 'rhubarb: ' . a:response.message
 endfunction
 
 let s:reference = '\<\%(\c\%(clos\|resolv\|referenc\)e[sd]\=\|\cfix\%(e[sd]\)\=\)\>'
