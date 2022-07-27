@@ -286,7 +286,7 @@ function! rhubarb#Complete(findstart, base) abort
     endif
   catch /^rhubarb:.*is not a GitHub repository/
   catch /^\%(fugitive\|rhubarb\):/
-    echoerr v:errmsg
+    echoerr v:exception
   endtry
 endfunction
 
