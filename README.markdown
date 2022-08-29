@@ -5,7 +5,7 @@ of features:
 
 * Enables `:GBrowse` from fugitive.vim to open GitHub URLs.
 
-* Enables `:.GBrowse` from fugitive.vim to open GitHub URLs at specific line number.
+* Enables `:.GBrowse` from fugitive.vim to open GitHub URLs at a specific line number.
 
 * In commit messages, GitHub issues, issue URLs, and collaborators can be
   omni-completed (`<C-X><C-O>`, see `:help compl-omni`).  This makes inserting
