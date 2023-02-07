@@ -331,6 +331,9 @@ function! rhubarb#FugitiveUrl(...) abort
   else
     let url = root . '/commit/' . commit
   endif
+  if get(g:, 'rhubarb_yank_url', 0)
+    let @+ = url
+  endif
   return url
 endfunction
 

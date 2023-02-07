@@ -36,6 +36,10 @@ If you are using GitHub Enterprise, repeat this step for each domain (omit the
 
     let g:github_enterprise_urls = ['https://example.com']
 
+If you also want to yank the url, set:
+
+    let g:rhubarb_yank_url = 1
+
 ## FAQ
 
 > How do I turn off that preview window that shows the issue body?
