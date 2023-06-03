@@ -322,6 +322,11 @@ function! rhubarb#FugitiveUrl(...) abort
   let commit = opts.commit
   if get(opts, 'type', '') ==# 'tree' || opts.path =~# '/$'
     let url = substitute(root . '/tree/' . commit . '/' . path, '/$', '', 'g')
+  elseif get(opts, 'type', '') ==# 'src' || opts.path =~# '[^/]$'
+    let url = substitute(root . '/src/' . commit . '/' . path, '/$', '', 'g')
+    if get(opts, 'line2') > 0 && get(opts, 'line1') == opts.line2
+      let url .= '#lines-' . opts.line1
+    endif
   elseif get(opts, 'type', '') ==# 'blob' || opts.path =~# '[^/]$'
     let escaped_commit = substitute(commit, '#', '%23', 'g')
     let url = root . '/blob/' . escaped_commit . '/' . path
