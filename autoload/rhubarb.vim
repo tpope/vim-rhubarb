@@ -236,7 +236,7 @@ endfunction
 function! s:CompleteAddIssues(response, prefix) abort
   for issue in get(a:response, 'items', [])
     call complete_add({
-          \ 'word': a:prefix . issue.number,
+          \ 'word': empty(a:prefix) ? issue.html_url : a:prefix . issue.number,
           \ 'abbr': '#' . issue.number,
           \ 'menu': issue.title,
           \ 'info': substitute(empty(issue.body) ? "\n" : issue.body,'\r','','g'),
@@ -262,11 +262,13 @@ function! rhubarb#Complete(findstart, base) abort
         let prefix = '#'
         let query = ''
       else
-        let prefix = s:repo_homepage().'/issues/'
+        let prefix = ''
         let query = a:base
       endif
-      let response = rhubarb#RepoSearch('issues', 'state:open ' . query)
-      call s:CompleteAddIssues(response, prefix)
+      let issues = rhubarb#RepoSearch('issues', 'state:open is:issue ' . query)
+      call s:CompleteAddIssues(issues, prefix)
+      let prs = rhubarb#RepoSearch('issues', 'state:open is:pr ' . query)
+      call s:CompleteAddIssues(prs, prefix)
     endif
   catch /^rhubarb:.*is not a GitHub repository/
   catch /^\%(fugitive\|rhubarb\):/
