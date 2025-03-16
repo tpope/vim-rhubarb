@@ -69,10 +69,6 @@ function! rhubarb#HomepageForUrl(url) abort
   return substitute(root, '/$', '', '') . '/' . match[4]
 endfunction
 
-function! rhubarb#homepage_for_url(url) abort
-  return rhubarb#HomepageForUrl(a:url)
-endfunction
-
 function! s:repo_homepage() abort
   if exists('b:rhubarb_homepage')
     return b:rhubarb_homepage
@@ -223,16 +219,8 @@ function! rhubarb#Request(path, ...) abort
   endif
 endfunction
 
-function! rhubarb#request(...) abort
-  return call('rhubarb#Request', a:000)
-endfunction
-
 function! rhubarb#RepoRequest(...) abort
   return rhubarb#Request('repos/%s' . (a:0 && a:1 !=# '' ? '/' . a:1 : ''), a:0 > 1 ? a:2 : {})
-endfunction
-
-function! rhubarb#repo_request(...) abort
-  return call('rhubarb#RepoRequest', a:000)
 endfunction
 
 function! s:url_encode(str) abort
@@ -243,16 +231,12 @@ function! rhubarb#RepoSearch(type, q, ...) abort
   return call('rhubarb#Request', ['search/'.a:type.'?per_page=100&q=repo:%s'.s:url_encode(' '.a:q)] + a:000)
 endfunction
 
-function! rhubarb#repo_search(...) abort
-  return call('rhubarb#RepoSearch', a:000)
-endfunction
-
 " Section: Issues
 
 function! s:CompleteAddIssues(response, prefix) abort
   for issue in get(a:response, 'items', [])
     call complete_add({
-          \ 'word': a:prefix . issue.number,
+          \ 'word': empty(a:prefix) ? issue.html_url : a:prefix . issue.number,
           \ 'abbr': '#' . issue.number,
           \ 'menu': issue.title,
           \ 'info': substitute(empty(issue.body) ? "\n" : issue.body,'\r','','g'),
@@ -278,20 +262,18 @@ function! rhubarb#Complete(findstart, base) abort
         let prefix = '#'
         let query = ''
       else
-        let prefix = s:repo_homepage().'/issues/'
+        let prefix = ''
         let query = a:base
       endif
-      let response = rhubarb#RepoSearch('issues', 'state:open ' . query)
-      call s:CompleteAddIssues(response, prefix)
+      let issues = rhubarb#RepoSearch('issues', 'state:open is:issue ' . query)
+      call s:CompleteAddIssues(issues, prefix)
+      let prs = rhubarb#RepoSearch('issues', 'state:open is:pr ' . query)
+      call s:CompleteAddIssues(prs, prefix)
     endif
   catch /^rhubarb:.*is not a GitHub repository/
   catch /^\%(fugitive\|rhubarb\):/
     echoerr v:exception
   endtry
-endfunction
-
-function! rhubarb#omnifunc(findstart, base) abort
-  return rhubarb#Complete(a:findstart, a:base)
 endfunction
 
 " Section: Fugitive :GBrowse support
@@ -342,10 +324,6 @@ function! rhubarb#FugitiveUrl(...) abort
     let url = root . '/commit/' . commit
   endif
   return url
-endfunction
-
-function! rhubarb#fugitive_url(...) abort
-  return call('rhubarb#FugitiveUrl', a:000)
 endfunction
 
 " Section: End
