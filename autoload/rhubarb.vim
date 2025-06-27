@@ -274,6 +274,7 @@ function! rhubarb#Complete(findstart, base) abort
   catch /^\%(fugitive\|rhubarb\):/
     echoerr v:exception
   endtry
+  return []
 endfunction
 
 " Section: Fugitive :GBrowse support
